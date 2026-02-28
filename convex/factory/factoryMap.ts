@@ -14,7 +14,8 @@ export const serializedFactoryMap = {
   ),
 };
 
-export type SerializedFactoryMap = Infer<typeof v.object(serializedFactoryMap)>;
+const serializedFactoryMapValidator = v.object(serializedFactoryMap);
+export type SerializedFactoryMap = Infer<typeof serializedFactoryMapValidator>;
 
 export class FactoryMap {
   width: number;

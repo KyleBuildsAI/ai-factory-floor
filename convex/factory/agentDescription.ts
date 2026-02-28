@@ -9,7 +9,8 @@ export const serializedAgentDescription = {
   color: v.number(),
 };
 
-export type SerializedAgentDescription = Infer<typeof v.object(serializedAgentDescription)>;
+const serializedAgentDescriptionValidator = v.object(serializedAgentDescription);
+export type SerializedAgentDescription = Infer<typeof serializedAgentDescriptionValidator>;
 
 export class AgentDescription {
   agentId: string;

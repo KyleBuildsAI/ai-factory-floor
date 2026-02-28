@@ -20,7 +20,8 @@ export const serializedAgent = {
   lastWakeup: v.optional(v.number()),
 };
 
-export type SerializedAgent = Infer<typeof v.object(serializedAgent)>;
+const serializedAgentValidator = v.object(serializedAgent);
+export type SerializedAgent = Infer<typeof serializedAgentValidator>;
 
 export class FactoryAgent {
   id: GameId<'agents'>;

@@ -15,6 +15,7 @@
     "jsx": "preserve",
     "incremental": true,
     "allowImportingTsExtensions": true,
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"]
     }

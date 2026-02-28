@@ -7,7 +7,8 @@ export const serializedWorld = {
   agents: v.array(v.object(serializedAgent)),
 };
 
-export type SerializedWorld = Infer<typeof v.object(serializedWorld)>;
+const serializedWorldValidator = v.object(serializedWorld);
+export type SerializedWorld = Infer<typeof serializedWorldValidator>;
 
 export class FactoryWorld {
   nextId: number;
