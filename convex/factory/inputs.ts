@@ -47,13 +47,13 @@ export const inputs = {
       }
       agent.status = args.status;
       if (args.speechBubble !== undefined) {
-        agent.speechBubble = args.speechBubble;
+        agent.speechBubble = args.speechBubble || undefined;
       }
       if (args.currentSubtaskId !== undefined) {
-        agent.currentSubtaskId = args.currentSubtaskId;
+        agent.currentSubtaskId = args.currentSubtaskId || undefined;
       }
       if (args.currentPromptId !== undefined) {
-        agent.currentPromptId = args.currentPromptId;
+        agent.currentPromptId = args.currentPromptId || undefined;
       }
       return null;
     },

@@ -1,10 +1,8 @@
-import { v } from 'convex/values';
 import { internal } from './_generated/api';
 import { DatabaseReader, MutationCtx, mutation } from './_generated/server';
 import { DefaultAgents } from '../data/agents';
 import { mapLayout, workstations, MAP_WIDTH, MAP_HEIGHT, TILE_SIZE } from '../data/factoryMap';
 import { createEngine } from './factory/main';
-import { insertInput } from './factory/insertInput';
 import { ENGINE_ACTION_DURATION } from './constants';
 import { Id } from './_generated/dataModel';
 
@@ -19,15 +17,27 @@ const init = mutation({
     }
     const shouldCreate = await shouldCreateAgents(ctx.db, worldStatus.worldId);
     if (shouldCreate) {
+      // Create agents directly in world document with known IDs
+      const world = await ctx.db.get(worldStatus.worldId);
+      if (!world) throw new Error(`World ${worldStatus.worldId} not found`);
+
+      let nextId = world.nextId;
+      const agents = [];
+
       for (const agentDef of DefaultAgents) {
-        await insertInput(ctx, worldStatus.worldId, 'createAgent', {
+        const agentId = `a:${nextId}`;
+        nextId++;
+
+        agents.push({
+          id: agentId,
           role: agentDef.role,
+          status: 'idle',
           workstationPosition: agentDef.workstationPosition,
         });
-        // Insert agent description
+
         await ctx.db.insert('agentDescriptions', {
           worldId: worldStatus.worldId,
-          agentId: '', // Will be patched after first tick processes createAgent
+          agentId,
           name: agentDef.name,
           role: agentDef.role,
           identity: agentDef.identity,
@@ -35,6 +45,11 @@ const init = mutation({
           color: agentDef.color,
         });
       }
+
+      await ctx.db.patch(worldStatus.worldId, {
+        nextId,
+        agents,
+      });
     }
   },
 });
@@ -90,21 +105,5 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
 async function shouldCreateAgents(db: DatabaseReader, worldId: Id<'worlds'>) {
   const world = await db.get(worldId);
   if (!world) throw new Error(`World ${worldId} not found`);
-  if (world.agents.length > 0) return false;
-
-  // Check for pending createAgent inputs
-  const worldStatus = await db
-    .query('worldStatus')
-    .withIndex('worldId', (q) => q.eq('worldId', worldId))
-    .unique();
-  if (!worldStatus) return true;
-
-  const pendingInput = await db
-    .query('inputs')
-    .withIndex('byInputNumber', (q) => q.eq('engineId', worldStatus.engineId))
-    .order('asc')
-    .filter((q) => q.eq(q.field('name'), 'createAgent'))
-    .filter((q) => q.eq(q.field('returnValue'), undefined))
-    .first();
-  return !pendingInput;
+  return world.agents.length === 0;
 }

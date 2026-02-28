@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 import { internalAction } from '../_generated/server';
-import { internal, api } from '../_generated/api';
+import { internal } from '../_generated/api';
 import { Id } from '../_generated/dataModel';
 import { chatCompletion } from '../util/llm';
 import { sleep } from '../util/sleep';
@@ -29,7 +29,7 @@ export const managerCheckWork = internalAction({
         status: 'decomposing',
       });
       // Update agent status
-      await ctx.runMutation(api.factory.main.sendInput, {
+      await ctx.runMutation(internal.factory.main.sendInput, {
         engineId: await getEngineId(ctx, worldId),
         name: 'updateAgentStatus',
         args: {
@@ -60,7 +60,7 @@ export const managerCheckWork = internalAction({
         { promptId: prompt._id },
       );
       if (allDone) {
-        await ctx.runMutation(api.factory.main.sendInput, {
+        await ctx.runMutation(internal.factory.main.sendInput, {
           engineId: await getEngineId(ctx, worldId),
           name: 'updateAgentStatus',
           args: {
@@ -122,7 +122,7 @@ export const agentCheckWork = internalAction({
         agentId: args.agentId,
       });
       // Update status
-      await ctx.runMutation(api.factory.main.sendInput, {
+      await ctx.runMutation(internal.factory.main.sendInput, {
         engineId: await getEngineId(ctx, worldId),
         name: 'updateAgentStatus',
         args: {
@@ -237,7 +237,7 @@ Order determines execution sequence. Tasks with the same order can run in parall
       });
 
       // Update manager speech bubble
-      await ctx.runMutation(api.factory.main.sendInput, {
+      await ctx.runMutation(internal.factory.main.sendInput, {
         engineId: await getEngineId(ctx, args.worldId),
         name: 'updateAgentStatus',
         args: {
@@ -296,9 +296,9 @@ export const agentProcessSubtask = internalAction({
       }
     }
 
-    const systemPrompt = `${agentDesc?.identity ?? 'You are a specialist AI agent.'}
+    const systemPrompt = agentDesc?.identity ?? 'You are a specialist AI agent.';
 
-You are working on the AI Factory Floor, processing a subtask that was assigned to you by the Manager.
+    const userPrompt = `You are working on the AI Factory Floor, processing a subtask assigned to you by the Manager.
 
 Original user prompt: "${prompt?.text ?? ''}"
 
@@ -316,7 +316,10 @@ Complete this subtask thoroughly. Provide your complete output below:`;
 
     try {
       const { content } = await chatCompletion({
-        messages: [{ role: 'system', content: systemPrompt }],
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
         max_tokens: SUBTASK_MAX_TOKENS,
       });
 
@@ -336,14 +339,14 @@ Complete this subtask thoroughly. Provide your complete output below:`;
       });
 
       // Update agent speech bubble
-      await ctx.runMutation(api.factory.main.sendInput, {
+      await ctx.runMutation(internal.factory.main.sendInput, {
         engineId: await getEngineId(ctx, args.worldId),
         name: 'updateAgentStatus',
         args: {
           agentId: args.agentId,
           status: 'idle',
           speechBubble: 'Task complete ✓',
-          currentSubtaskId: undefined,
+          currentSubtaskId: '',
         },
       });
     } catch (e: any) {
@@ -384,9 +387,9 @@ export const managerAssembleOutput = internalAction({
       .map((st: any) => `### ${st.title} (${st.assignedRole})\n${st.output}`)
       .join('\n\n---\n\n');
 
-    const systemPrompt = `You are the Manager of an AI Factory Floor. Your specialist agents have completed their subtasks for the user's prompt. Assemble their outputs into a single, coherent, well-structured final response.
+    const systemPrompt = `You are the Manager of an AI Factory Floor. Your specialist agents have completed their subtasks for the user's prompt. Your job is to assemble their outputs into a single, coherent, well-structured final response.`;
 
-Original user prompt: "${prompt.text}"
+    const userPrompt = `Original user prompt: "${prompt.text}"
 
 Specialist outputs:
 ${subtaskOutputs}
@@ -395,7 +398,10 @@ Synthesize these into a polished final response for the user. Keep the best part
 
     try {
       const { content } = await chatCompletion({
-        messages: [{ role: 'system', content: systemPrompt }],
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
         max_tokens: ASSEMBLE_MAX_TOKENS,
       });
 
@@ -405,14 +411,14 @@ Synthesize these into a polished final response for the user. Keep the best part
         finalOutput: content,
       });
 
-      await ctx.runMutation(api.factory.main.sendInput, {
+      await ctx.runMutation(internal.factory.main.sendInput, {
         engineId: await getEngineId(ctx, args.worldId),
         name: 'updateAgentStatus',
         args: {
           agentId: args.agentId,
           status: 'idle',
           speechBubble: 'Output assembled ✓',
-          currentPromptId: undefined,
+          currentPromptId: '',
         },
       });
     } catch (e: any) {
@@ -436,7 +442,7 @@ export const agentIdleBehavior = internalAction({
   },
   handler: async (ctx, args) => {
     const msg = IDLE_MESSAGES[Math.floor(Math.random() * IDLE_MESSAGES.length)];
-    await ctx.runMutation(api.factory.main.sendInput, {
+    await ctx.runMutation(internal.factory.main.sendInput, {
       engineId: await getEngineId(ctx, args.worldId),
       name: 'updateAgentStatus',
       args: {
@@ -457,7 +463,7 @@ async function finishOp(
   args: { worldId: Id<'worlds'>; agentId: string; operationId: string },
 ) {
   const engineId = await getEngineId(ctx, args.worldId);
-  await ctx.runMutation(api.factory.main.sendInput, {
+  await ctx.runMutation(internal.factory.main.sendInput, {
     engineId,
     name: 'finishOperation',
     args: { agentId: args.agentId, operationId: args.operationId },

@@ -1,12 +1,12 @@
 import { v } from 'convex/values';
 import { Id } from '../_generated/dataModel';
-import { internal, api } from '../_generated/api';
+import { internal } from '../_generated/api';
 import {
   DatabaseReader,
   MutationCtx,
   internalAction,
   internalMutation,
-  mutation,
+  internalQuery,
   query,
 } from '../_generated/server';
 import { loadEngine, applyEngineUpdate, engineUpdate, engineInsertInput } from '../engine/abstractGame';
@@ -136,7 +136,7 @@ export const saveWorld = internalMutation({
   },
 });
 
-export const sendInput = mutation({
+export const sendInput = internalMutation({
   args: {
     engineId: v.id('engines'),
     name: v.string(),

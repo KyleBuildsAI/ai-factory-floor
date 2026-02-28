@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { Stage } from '@pixi/react';
-import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { ConvexProvider } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { convexClient } from './ConvexClientProvider';
 import PixiGame from './PixiGame';
 import { AgentPanel } from './AgentPanel';
 import { PromptInput } from './PromptInput';
@@ -11,20 +12,11 @@ import { useServerGame } from '../hooks/serverGame';
 import { useWorldHeartbeat } from '../hooks/useWorldHeartbeat';
 import { GameId } from '../../convex/factory/ids';
 
-function convexUrl(): string {
-  const url = import.meta.env.VITE_CONVEX_URL as string;
-  if (!url) throw new Error("Couldn't find the Convex deployment URL.");
-  return url;
-}
-
-const convex = new ConvexReactClient(convexUrl(), { unsavedChangesWarning: false });
-
 export default function Game() {
   useWorldHeartbeat();
 
   const worldStatus = useQuery(api.world.defaultWorldStatus);
-  const worldId = worldStatus?.worldId;
-  const game = useServerGame(worldId);
+  const game = useServerGame(worldStatus?.worldId);
 
   const [selectedAgentId, setSelectedAgentId] = useState<GameId<'agents'> | null>(null);
 
@@ -36,6 +28,7 @@ export default function Game() {
     );
   }
 
+  const worldId = worldStatus.worldId;
   const canvasWidth = 640;
   const canvasHeight = 480;
 
@@ -50,7 +43,7 @@ export default function Game() {
             height={canvasHeight}
             options={{ backgroundColor: 0xf0f0f0 }}
           >
-            <ConvexProvider client={convex}>
+            <ConvexProvider client={convexClient}>
               <PixiGame
                 game={game}
                 width={canvasWidth}

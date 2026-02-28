@@ -9,8 +9,8 @@ function convexUrl(): string {
   return url;
 }
 
-const convex = new ConvexReactClient(convexUrl(), { unsavedChangesWarning: false });
+export const convexClient = new ConvexReactClient(convexUrl(), { unsavedChangesWarning: false });
 
 export default function ConvexClientProvider({ children }: { children: ReactNode }) {
-  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+  return <ConvexProvider client={convexClient}>{children}</ConvexProvider>;
 }

@@ -1,6 +1,5 @@
 import { v } from 'convex/values';
 import { query, mutation } from './_generated/server';
-import { engineInsertInput } from './engine/abstractGame';
 
 export const defaultWorldStatus = query({
   handler: async (ctx) => {
@@ -50,13 +49,3 @@ export const heartbeatWorld = mutation({
   },
 });
 
-export const sendWorldInput = mutation({
-  args: {
-    engineId: v.id('engines'),
-    name: v.string(),
-    args: v.any(),
-  },
-  handler: async (ctx, args) => {
-    return await engineInsertInput(ctx, args.engineId, args.name, args.args);
-  },
-});

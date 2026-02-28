@@ -19,35 +19,6 @@ export const TILE_COLORS: Record<number, number> = {
   [TILE_PLANT]: 0x2ecc71,
 };
 
-// W = wall, F = floor, D = desk, M = monitor, T = task board, P = plant
-const layoutKey: Record<string, number> = {
-  W: TILE_WALL,
-  F: TILE_FLOOR,
-  D: TILE_DESK,
-  M: TILE_MONITOR,
-  T: TILE_TASKBOARD,
-  P: TILE_PLANT,
-};
-
-// 20 columns x 15 rows
-const layoutStr = [
-  'WWWWWWWWWWWWWWWWWWWW', // 0 - top wall
-  'WTTTTTTTFFFFFFFFFFF W', // 1 - task board area
-  'WFFFFFFFFFFFFFFFFFFFW', // 2
-  'WFFFFFFFFDMFFFFFFFFW', // 3 - Manager desk
-  'WFFFFFFFFFFFFFFFFFFFW', // 4
-  'WFFDMFFFFDMFFFFDMFFFFDMFW', // 5 - desks row 1 (monitors)
-  'WFFFFFFFFFFFFFFFFFFFFFFFFFFFFW', // 6 - agent row 1
-  'WFFFFFFFFFFFFFFFFFFFW', // 7
-  'WFFFFFFFFFFFFFFFFFFFW', // 8
-  'WFFDMFFFFDMFFFFDMFPFW', // 9 - desks row 2
-  'WFFFFFFFFFFFFFFFFFFFW', // 10 - agent row 2
-  'WFFFFFFFFFFFFFFFFFFFW', // 11
-  'WFFFFFFFFFFFFFFFFFFFPW', // 12
-  'WFFFFFFFFFFFFFFFFFFFFW', // 13
-  'WWWWWWWWWWWWWWWWWWWW', // 14 - bottom wall
-];
-
 // Generate a proper 20x15 grid programmatically
 function generateLayout(): number[][] {
   const grid: number[][] = [];
