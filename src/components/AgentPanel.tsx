@@ -17,7 +17,6 @@ export function AgentPanel({
   const agent = selectedAgentId ? game.world.agents.get(selectedAgentId) : null;
   const desc = selectedAgentId ? game.agentDescriptions.get(selectedAgentId) : null;
 
-  // Get work logs if agent has a current subtask
   const subtaskId = agent?.currentSubtaskId as Id<'subtasks'> | undefined;
   const workLogs = useQuery(
     api.factory.prompts.getWorkLogs,
@@ -27,20 +26,27 @@ export function AgentPanel({
   if (!agent || !desc) {
     return (
       <div className="p-4">
-        <h3 className="text-lg font-bold text-factory-200 mb-4">Agents</h3>
-        <div className="space-y-2">
+        <h3 className="text-sm font-bold text-factory-300 mb-3 uppercase tracking-wider">
+          Agents
+        </h3>
+        <div className="space-y-1.5">
           {[...game.world.agents.values()].map((a) => {
             const d = game.agentDescriptions.get(a.id);
             if (!d) return null;
             return (
               <div
                 key={a.id}
-                className="flex items-center gap-2 p-2 rounded bg-factory-800 border border-factory-700"
+                className="flex items-center gap-2 p-2 rounded bg-factory-800 border border-factory-700 hover:border-factory-600 transition-colors"
               >
-                <span className="text-lg">{d.emoji}</span>
+                <div
+                  className="w-6 h-6 rounded flex items-center justify-center text-xs"
+                  style={{ backgroundColor: `#${d.color.toString(16).padStart(6, '0')}30` }}
+                >
+                  <span>{d.emoji}</span>
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-factory-200">{d.name}</div>
-                  <div className="text-xs text-factory-400">{d.role}</div>
+                  <div className="text-xs font-bold text-factory-200">{d.name}</div>
+                  <div className="text-[10px] text-factory-500 uppercase">{d.role}</div>
                 </div>
                 <StatusBadge status={a.status} />
               </div>
@@ -51,34 +57,36 @@ export function AgentPanel({
     );
   }
 
+  const colorHex = `#${desc.color.toString(16).padStart(6, '0')}`;
+
   return (
     <div className="p-4">
       {/* Agent header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-factory-700">
         <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-          style={{ backgroundColor: `#${desc.color.toString(16).padStart(6, '0')}` }}
+          className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+          style={{ backgroundColor: `${colorHex}30`, border: `2px solid ${colorHex}60` }}
         >
           {desc.emoji}
         </div>
         <div>
-          <h3 className="text-lg font-bold text-factory-100">{desc.name}</h3>
-          <div className="text-sm text-factory-400 capitalize">{desc.role}</div>
+          <h3 className="text-base font-bold text-factory-50">{desc.name}</h3>
+          <div className="text-[10px] text-factory-400 uppercase tracking-wider mb-1">{desc.role}</div>
           <StatusBadge status={agent.status} />
         </div>
       </div>
 
       {/* Identity */}
       <div className="mb-4">
-        <h4 className="text-xs uppercase text-factory-500 mb-1">Identity</h4>
-        <p className="text-sm text-factory-300">{desc.identity}</p>
+        <h4 className="text-[10px] uppercase text-factory-500 tracking-wider mb-1">Identity</h4>
+        <p className="text-xs text-factory-300 leading-relaxed">{desc.identity}</p>
       </div>
 
       {/* Current task */}
       {agent.speechBubble && (
         <div className="mb-4">
-          <h4 className="text-xs uppercase text-factory-500 mb-1">Current Activity</h4>
-          <div className="p-2 rounded bg-factory-800 border border-factory-700 text-sm text-factory-200">
+          <h4 className="text-[10px] uppercase text-factory-500 tracking-wider mb-1">Activity</h4>
+          <div className="p-2 rounded bg-factory-800 border border-factory-700 text-xs text-factory-200 font-mono">
             {agent.speechBubble}
           </div>
         </div>
@@ -87,8 +95,8 @@ export function AgentPanel({
       {/* Work output */}
       {workLogs && workLogs.length > 0 && (
         <div>
-          <h4 className="text-xs uppercase text-factory-500 mb-1">Work Output</h4>
-          <div className="p-3 rounded bg-factory-900 border border-factory-700 text-sm text-factory-300 max-h-64 overflow-y-auto font-mono whitespace-pre-wrap">
+          <h4 className="text-[10px] uppercase text-factory-500 tracking-wider mb-1">Output</h4>
+          <div className="p-2 rounded bg-factory-950 border border-factory-700 text-xs text-factory-300 max-h-64 overflow-y-auto font-mono whitespace-pre-wrap leading-relaxed">
             {workLogs.map((log: any) => log.content).join('\n')}
           </div>
         </div>

@@ -28,16 +28,16 @@ export function PromptInput({ worldId }: { worldId: Id<'worlds'> }) {
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Enter a prompt for your AI agents..."
-        className="flex-1 px-4 py-2 rounded-lg bg-factory-800 border border-factory-600 text-factory-100 placeholder-factory-500 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue text-sm"
+        placeholder="> Enter a prompt for your AI agents..."
+        className="flex-1 px-3 py-2 rounded bg-factory-800 border border-factory-600 text-factory-50 placeholder-factory-500 focus:outline-none focus:border-accent-orange focus:ring-1 focus:ring-accent-orange text-sm font-mono"
         disabled={submitting}
       />
       <button
         type="submit"
         disabled={submitting || !text.trim()}
-        className="px-6 py-2 rounded-lg bg-accent-blue text-white font-medium text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-5 py-2 rounded bg-accent-orange text-white font-bold text-sm hover:bg-accent-orange-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors uppercase tracking-wider"
       >
-        {submitting ? 'Sending...' : 'Send'}
+        {submitting ? '...' : 'Send'}
       </button>
     </form>
   );

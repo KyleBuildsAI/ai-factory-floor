@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #102a43;
-  --color-surface: #243b53;
-  --color-border: #334e68;
-  --color-text: #d9e2ec;
-  --color-text-muted: #829ab1;
-  --color-accent: #4A90D9;
+  --color-bg: #1a1410;
+  --color-surface: #2a2018;
+  --color-border: #3a3028;
+  --color-text: #e8d8c8;
+  --color-text-muted: #a89878;
+  --color-accent: #ff6b35;
 }
 
 body {
@@ -16,6 +16,7 @@ body {
   padding: 0;
   background-color: var(--color-bg);
   color: var(--color-text);
+  font-family: 'Courier New', monospace;
 }
 
 /* Pulsing status dot animation */
@@ -26,4 +27,36 @@ body {
 
 .animate-pulse-dot {
   animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1410;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3028;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4038;
+}
+
+/* Canvas container */
+canvas {
+  image-rendering: auto;
 }

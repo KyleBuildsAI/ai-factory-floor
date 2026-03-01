@@ -1,22 +1,22 @@
 import clsx from 'clsx';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; pulse?: boolean }> = {
-  idle: { label: 'Idle', color: 'bg-gray-400' },
-  working: { label: 'Working', color: 'bg-green-500', pulse: true },
-  thinking: { label: 'Thinking', color: 'bg-yellow-500', pulse: true },
-  reviewing: { label: 'Reviewing', color: 'bg-blue-500', pulse: true },
-  pending: { label: 'Pending', color: 'bg-gray-400' },
-  decomposing: { label: 'Decomposing', color: 'bg-yellow-500', pulse: true },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500', pulse: true },
-  completed: { label: 'Completed', color: 'bg-green-500' },
-  failed: { label: 'Failed', color: 'bg-red-500' },
-  assigned: { label: 'Assigned', color: 'bg-purple-500' },
+  idle: { label: 'Idle', color: 'bg-factory-500' },
+  working: { label: 'Working', color: 'bg-accent-green', pulse: true },
+  thinking: { label: 'Thinking', color: 'bg-accent-yellow', pulse: true },
+  reviewing: { label: 'Reviewing', color: 'bg-accent-blue', pulse: true },
+  pending: { label: 'Pending', color: 'bg-factory-500' },
+  decomposing: { label: 'Decomposing', color: 'bg-accent-yellow', pulse: true },
+  in_progress: { label: 'In Progress', color: 'bg-accent-orange', pulse: true },
+  completed: { label: 'Completed', color: 'bg-accent-green' },
+  failed: { label: 'Failed', color: 'bg-accent-red' },
+  assigned: { label: 'Assigned', color: 'bg-accent-purple' },
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const config = STATUS_CONFIG[status] ?? { label: status, color: 'bg-gray-400' };
+  const config = STATUS_CONFIG[status] ?? { label: status, color: 'bg-factory-500' };
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs">
+    <span className="inline-flex items-center gap-1.5 text-xs font-mono">
       <span
         className={clsx(
           'w-2 h-2 rounded-full',
@@ -24,7 +24,7 @@ export function StatusBadge({ status }: { status: string }) {
           config.pulse && 'animate-pulse-dot',
         )}
       />
-      <span className="text-factory-300">{config.label}</span>
+      <span className="text-factory-300 uppercase tracking-wider text-[10px]">{config.label}</span>
     </span>
   );
 }
