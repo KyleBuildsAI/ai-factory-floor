@@ -56,15 +56,45 @@ export const kick = mutation({
   },
 });
 
+export const clearStaleOperations = mutation({
+  handler: async (ctx) => {
+    const worldStatus = await ctx.db
+      .query('worldStatus')
+      .filter((q) => q.eq(q.field('isDefault'), true))
+      .unique();
+    if (!worldStatus) throw new Error('No default world found');
+    const world = await ctx.db.get(worldStatus.worldId);
+    if (!world) throw new Error('No world found');
+
+    // Clear stale operations from all agents
+    const agents = world.agents.map((a: any) => ({
+      ...a,
+      inProgressOperation: undefined,
+      status: 'idle',
+    }));
+    await ctx.db.patch(worldStatus.worldId, { agents });
+    return `Cleared operations from ${agents.length} agents`;
+  },
+});
+
 export const wipeAllTables = mutation({
   handler: async (ctx) => {
+    // Stop engine first
+    const worldStatus = await ctx.db
+      .query('worldStatus')
+      .filter((q) => q.eq(q.field('isDefault'), true))
+      .unique();
+    if (worldStatus) {
+      const engine = await ctx.db.get(worldStatus.engineId);
+      if (engine) await ctx.db.patch(engine._id, { running: false });
+    }
+
     const tables = [
       'worlds',
       'worldStatus',
       'maps',
       'agentDescriptions',
       'engines',
-      'inputs',
       'prompts',
       'subtasks',
       'workLogs',
@@ -75,5 +105,13 @@ export const wipeAllTables = mutation({
         await ctx.db.delete(doc._id);
       }
     }
+    // Clear inputs in batches (can be large)
+    let batch;
+    do {
+      batch = await ctx.db.query('inputs' as any).take(500);
+      for (const doc of batch) {
+        await ctx.db.delete(doc._id);
+      }
+    } while (batch.length === 500);
   },
 });
